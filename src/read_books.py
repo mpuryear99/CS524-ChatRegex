@@ -25,8 +25,8 @@ def read_book(filename: str):
             header.append(line)
 
         # split the book into chapters of paragraph lines
-        for c in re.split(r"(?:\n[^\S\r\n]*){3,}", fin.read()):
-            chap = [p for p in re.split(r"(?:\n[^\S\r\n]*){2}", c) if len(p) and not p.isspace()]
+        for c in re.split(r"(?:\n[^\S\r\n]*){4,}", fin.read()):
+            chap = [p for p in re.split(r"(?:\n[^\S\r\n]*){2,3}", c) if len(p) and not p.isspace()]
             chapters.append(chap)
 
     # combine the paragraph lines
