@@ -168,6 +168,45 @@ def process_book(book: dict):
     return results
 
 
+def get_next_sentence(content: list[list[str]], ch_idx: int, st_idx):
+    if (st_idx := st_idx+1) >= len(content[ch_idx]):
+        st_idx = 1
+        if (ch_idx := ch_idx+1) >= len(content):
+            return None
+    return (ch_idx, st_idx), content[ch_idx][st_idx]
+
+
+def get_prev_sentence(content: list[list[str]], ch_idx: int, st_idx):
+    if (st_idx := st_idx-1) < 1:
+        if (ch_idx := ch_idx-1) < 0:
+            return None
+        st_idx = len(content[ch_idx])-1
+    return (ch_idx, st_idx), content[ch_idx][st_idx]
+
+
+def get_surrounding_words(content: list[list[str]],
+                          match:   re.Match,
+                          loc:     tuple[int, int],
+                          n:       int = 3):
+    # In this implementation, surrounding words must be in the same chapter
+    ch_idx, st_idx = loc
+    chap = content[ch_idx]
+
+    prev_words = chap[st_idx][:match.span()[0]].rsplit(maxsplit=n)[:-n-1:-1]
+    for i in range(st_idx-1, 0, -1):        # skip sentence 0
+        if (maxsplit := n-len(prev_words)) <= 0:
+            break
+        prev_words.extend(chap[i].rsplit(maxsplit=maxsplit)[:-maxsplit-1:-1])
+    prev_words = prev_words[n-1::-1]
+
+    next_words = chap[st_idx][match.span()[1]+1:].split(maxsplit=n)
+    for i in range(st_idx+1, len(chap)):
+        if (maxsplit := n-len(next_words)) <= 0:
+            break
+        next_words.extend(chap[i].split(maxsplit=maxsplit))
+    next_words = next_words[:n]
+
+    return prev_words, next_words
 
 
 
