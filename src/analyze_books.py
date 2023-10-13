@@ -32,7 +32,7 @@ BOOK_AC_THE_MURDER_ON_THE_LINKS = {
       # "Dulcie Duveen":        r"Dulcie (?:\sDuveen)? | Cinderella",
     },
     'perpetrators': {
-        'Marthe Daubreuil':     r"Marthe (?:\sDaubreuil)?",
+        'Marthe Daubreuil':     r"(?:Madame\s|Mademoiselle\s)? Marthe (?:\sDaubreuil)?",
     },
     'victims': {
         "Paul Renauld":         r"Paul (?:\sRenauld)?",
@@ -81,18 +81,18 @@ BOOK_CD_THE_HOUND_OF_THE_BASKERVILLES = {
     'content':  read_book(fn)[1],
 
     'detectives': {
-        'Sherlock Holmes':      r"Sherlock (?:\sHolmes)? | Holmes",
-        'Dr. John Watson':      r"(?:Dr\.\s) (?:John (?:\sWatson)? | Watson)",
+        'Sherlock Holmes':      r"(?:Mr\.\s)? (?:Sherlock (?:\sHolmes)? | Holmes)",
+        'Dr. John Watson':      r"(?:Dr\.\s)? (?:John (?:\sWatson)? | Watson)",
     },
     'suspects': {
         'Henry Baskerville':    r"(?:Sir\s)? Henry (?:\sBaskerville)?",
         'James Mortimer':       r"(?:Dr\.\s)? (?:James (?:\sMortimer)? | Mortimer)",
-        'Laura Lyons':          r"Laura (?:\sLyons)? | Lyons",
-        'Beryl Stapleton':      r"(?:Miss\s|Mrs\.\s) Stapleton | Beryl (?:\sGarcia)",        # Tip: No 'Beryl Stapleton' in book
+        'Laura Lyons':          r"(?:Mrs\.\s)? (?:Laura (?:\sLyons)? | Lyons)",
+        'Beryl Stapleton':      r"(?:Miss\s|Mrs\.\s) Stapleton | Beryl (?:\sGarcia)",    # Tip: No 'Beryl Stapleton' in book
         'The Barrymores':       r"(?:Mr\.\s|Mrs\.\s)? Barrymores?"
     },
     'perpetrators': {
-        'Jack Stapleton':       r"Jack (?:\sStapleton)? | (?<!Miss\s|Mrs\.\s) Stapleton",
+        'Jack Stapleton':       r"(?:Mr\.\s)? (?:Jack (?:\sStapleton)? | (?<!Miss\s|Mrs\.\s) Stapleton)",
     },
     'victims': {
         'Charles Baskerville':  r"(?:Sir\s)? Charles (?:\sBaskerville)?",
@@ -150,17 +150,17 @@ def find_all_book_matches(content: list[list[str]], pattern: re.Pattern):
 def process_book(book: dict):
     results = {}
 
-    for category in ('detectives', 'perpetrators'):
+    for category in ('detectives', 'perpetrators', 'suspects', 'victims'):
         matches = results[category] = {}
         for k, re_k in book[category].items():
             re_k = re.compile(rf"\b(?:{re_k})\b", re.I | re.X)
             matches[k] = find_all_book_matches(book['content'], re_k)
 
-    for category in ('suspects', 'victims'):
-        matches = results[category] = {}
-        for k, re_k in book[category].items():
-            re_k = re.compile(rf"\b(?:{re_k})\b", re.I | re.X)
-            matches[k] = find_first_book_match(book['content'], re_k)
+    # for category in ('suspects', 'victims'):
+    #     matches = results[category] = {}
+    #     for k, re_k in book[category].items():
+    #         re_k = re.compile(rf"\b(?:{re_k})\b", re.I | re.X)
+    #         matches[k] = find_first_book_match(book['content'], re_k)
 
     re_crime = re.compile(rf"\b(?:{book['crime']})\b", re.I | re.X)
     results['crime'] = find_first_book_match(book['content'], re_crime)
