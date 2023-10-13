@@ -84,12 +84,26 @@ def output_nearby_words(content: list[list[str]],
               prev_words, "~", match.group(), "~", next_words)
 
 
-def output_first_match(name:  str,
-                       loc:   tuple[int, int],
-                       match: re.Match):
-    """ Output the location (chapter, sentence) of first match. """
+def output_first_match(name: str,
+                       matches: Iterable[tuple[tuple[int, int], re.Match]],
+                       print_match: bool | None = None):
+    """
+    Output the location (chapter, sentence) of first match.
 
+    Params:
+        name : str
+            Title associated with the set of matches.
+            Used to start each sentence response.
+        matches : Iterable[tuple[tuple[int, int], re.Match]]
+            Iterable of (loc, re.Match) tuples from which the first match is found.
+        print_match : bool | None
+            If True, print the term actually matched.
+            If None, print the matched term if it is different from `name`.
+    """
+
+    loc, match = min(matches, key=lambda kv: kv[0])
     ch_idx, st_idx = loc[0]+1, loc[1]
     print(f"{name} is first introduced in sentence {st_idx} of chapter {ch_idx}.")
-    if match.group() != name:
-        print(f"{name} is introduced as '{match.group()}'.")
+
+    if print_match or (print_match is None and match.group() != name):
+        print(f"{name} is introduced as '{match.group()}' in the sentence.")

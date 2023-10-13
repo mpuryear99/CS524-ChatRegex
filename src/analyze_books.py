@@ -163,7 +163,8 @@ def process_book(book: dict):
     #         matches[k] = find_first_book_match(book['content'], re_k)
 
     re_crime = re.compile(rf"\b(?:{book['crime']})\b", re.I | re.X)
-    results['crime'] = find_first_book_match(book['content'], re_crime)
+    # results['crime'] = find_first_book_match(book['content'], re_crime)
+    results['crime'] = find_all_book_matches(book['content'], re_crime)
 
     return results
 
