@@ -38,7 +38,7 @@ def read_book(filename: str):
             chapters.append(chap)
 
     # Combine the paragraph lines. Then, split into sentences
-    re_garbage = re.compile(r'[\[\]{}]()')
+    re_garbage = re.compile(r'[\[\]{}()]')
     re_dashes  = re.compile(r'(?<![^\s-])-|-(?![^\s-])')
     re_subsp   = re.compile(r'[—_\r\n\s]+')
     re_dquotes = re.compile(r"[“”]")

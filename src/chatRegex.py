@@ -53,7 +53,7 @@ def resp_category_first_match(book: dict,
                               category: str):
     if 'crime' in category:
         name = 'The crime'
-        matches = book['matches']['crime']
+        matches = book['matches']['crime'].items()
         resp_core.output_first_match(name, matches)
 
     else:
@@ -62,6 +62,7 @@ def resp_category_first_match(book: dict,
         print_category_person_count(category, len(cat_matches))
 
         for name, matches in cat_matches.items():
+            matches = matches.items()
             resp_core.output_first_match(name, matches)
 
 
@@ -80,7 +81,7 @@ def resp_category_nearby_words(book: str,
 
     if 'crime' in category:
         name = 'The crime'
-        matches = book['matches']['crime']
+        matches = book['matches']['crime'].items()
         resp_core.output_nearby_words(
             content, name=name, matches=matches, n=3)
 
@@ -90,6 +91,7 @@ def resp_category_nearby_words(book: str,
         print_category_person_count(category, len(cat_matches))
 
         for name, matches in cat_matches.items():
+            matches = matches.items()
             resp_core.output_nearby_words(
                 content, name=name, matches=matches, n=3)
 
@@ -142,7 +144,7 @@ def resp_co_occur(book: dict,
     if 'crime' in category2:
         # crime category
         locs2 = book['matches']['crime'].keys()
-        iter2 = (('The crime', locs2),)
+        iter2 = (('the crime', locs2),)
     elif name2 is None:
         # category of names
         cat2_matches = book['matches'][category2]
@@ -166,8 +168,8 @@ def resp_co_occur(book: dict,
             continue
         if add_sep: print("---")
         add_sep = True
-        resp_core.output_name_cooccurence(name1=p1, locs1=l1,
-                                          name2=p2, locs2=l2)
+        resp_core.output_name_cooccurence(book=book, name1=p1, locs1=l1,
+                                                     name2=p2, locs2=l2)
 
 
 
@@ -216,12 +218,125 @@ def prompt_select_book():
 
 
 
+RE_CATEGORY = {
+    'detectives':   r"detective|investigator|inspector",
+    'perpetrators': r"perpetrator|killer|criminal|murderer|culprit|evildoer|offender|villian",
+    'victims':      r"victim|casualty",
+    'suspects':     r"suspect|criminal",
+    'crime':        r"crime|kill|murder|dead|offense|misdeed",
+}
+
+
+
+
+def pro_get_name_matches(book: dict, prompt_in: str):
+
+    name_results = {}
+    for cat, re_cat in RE_CATEGORY.items():
+        if 'crime' in cat:
+            continue
+        for name, re_name in book[cat].items():
+            re_name = rf"\b(?:(?:{re_cat})\s)?(?:{re_name})\b"
+            match = re.search(re_name, prompt_in, re.I|re.X)
+
+            if match is not None:
+                name_results.setdefault(cat, {})[name] = match
+
+    return name_results
+
+
+def prompt_qa(book: dict, prompt_in: str):
+    """
+    The heart of the beast.
+    """
+
+    # replace unknown/unused characters with spaces
+    prompt_in = re.sub(r'[^-\w]+', ' ', prompt_in)
+
+    # Determine question type (what/when/how)
+    # q_who    = bool(re.search(r"who\s(?:is|are)", prompt_in, re.I))
+    q_first    = bool(re.search(r"first|introduced", prompt_in, re.I))
+    q_co_occur = bool(re.search(r"co-occur|together", prompt_in, re.I))
+    q_around   = bool(re.search(r"words|around|near(?:by)?|surround", prompt_in, re.I))
+
+    cat_results = set()
+    for cat, re_cat in RE_CATEGORY.items():
+        re_cat = rf"\b(?:(?:{re_cat})s?)\b"
+        if re.search(re_cat, prompt_in, re.I|re.X) is not None:
+                cat_results.add(cat)
+
+    name_results = pro_get_name_matches(book, prompt_in)
+    name_results = [(c,n) for (c,nn) in name_results.items() for n in nn.keys()]
+
+    total_results = len(name_results) + len(cat_results)
+
+    if sum([q_first, q_co_occur, q_co_occur]) != 1 or total_results == 0:
+        print("Sorry, but I'm not sure how to answer that.")
+        print("Maybe try rephrasing the question.")
+
+
+    if (q_first):
+        if len(name_results) > 1 or len(cat_results) > 1:
+            print("That's a lot to answer... ",
+                  "One name/category at a time for first occurance questions please.")
+        elif len(name_results):
+            cat, name = next(iter(name_results))
+            matches = book['matches'][cat][name].items()
+            resp_name_first_match(name, matches)
+        else:
+            cat = cat_results.pop()
+            resp_category_first_match(book, cat)
+
+    elif (q_around):
+        if len(name_results) > 1 or len(cat_results) > 1:
+            print("That's a lot to answer... ",
+                  "One name/category at a time for surrounding word questions please.")
+        elif len(name_results):
+            cat, name = next(iter(name_results))
+            matches = book['matches'][cat][name].items()
+            resp_name_nearby_words(book, name, matches)
+        else:
+            cat = cat_results.pop()
+            resp_category_nearby_words(book, cat)
+
+    elif (q_co_occur):
+        if len(name_results) > 2 or len(cat_results) > 2 or total_results < 2:
+            print("I'm not sure how to answer that... ",
+                  "Two names/categories at a time for co-occurence questions please.")
+        elif len(name_results) == 2:
+            it = iter(name_results)
+            cat1, name1 = next(it)
+            cat2, name2 = next(it)
+            resp_co_occur(book, name1=name1, category1=cat1,
+                                name2=name2, category2=cat2)
+        elif len(name_results) == 1:
+            cat1, name1 = next(iter(name_results))
+            cat2, name2 = cat_results.pop(), None
+            while (cat2 == cat1) and len(cat_results):
+                cat2 = cat_results.pop()
+            resp_co_occur(book, name1=name1, category1=cat1,
+                                name2=name2, category2=cat2)
+        else:
+            cat1, name1 = cat_results.pop(), None
+            cat2, name2 = cat_results.pop(), None
+            resp_co_occur(book, name1=name1, category1=cat1,
+                                name2=name2, category2=cat2)
+
+
+
+
+
 def main():
     print("\nWelcome to ChatRegex for Detective Novels!")
     print("I'm here to help you analyze your favorite novels.", end="\n\n")
 
     # Select a book to analyze
     book = prompt_select_book()
+
+    print("\nYou may now ask a question!  ('q' to quit)", end="\n\n")
+    while (prompt_in := input("> ").strip()) != 'q':
+        prompt_qa(book, prompt_in)
+        print("\nIs there anything else I can help with?  ('q' to quit)", end="\n\n")
 
     return
 

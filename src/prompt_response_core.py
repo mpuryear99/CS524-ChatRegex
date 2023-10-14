@@ -11,7 +11,8 @@ def output_missing_instance_warning():
     print("This is due to a lack of context knowledge often needed to disambiguate names.")
 
 
-def output_name_cooccurence(name1: str, locs1: Iterable[tuple[int, int]],
+def output_name_cooccurence(book: dict,
+                            name1: str, locs1: Iterable[tuple[int, int]],
                             name2: str, locs2: Iterable[tuple[int, int]]):
     """ Handle the response for two character co-occurences given index of matches.
         Co-occurences are found at the sentence and chapter scope.
@@ -45,10 +46,13 @@ def output_name_cooccurence(name1: str, locs1: Iterable[tuple[int, int]],
         print("However, they do not appear to share any sentences.")
     for ch, sts in st_locs_dict.items():
         if len(sts) > 1:
-            sts = f"s {', '.join(str(x) for x in sts[:-1])}, and {sts[-1]}"
+            sts_str = f"s {', '.join(str(x) for x in sts[:-1])}, and {sts[-1]}"
         else:
-            sts = f" {sts[0]}"
-        print(f"  In chapter {ch}, they co-occur in sentence{sts}.")
+            sts_str = f" {sts[0]}"
+        print(f"  In chapter {ch}, they co-occur in sentence{sts_str}.")
+        for st in sts:
+            print(f"  {st:>3}:  {book['content'][ch-1][st]}")
+
 
 
 def output_nearby_words(content: list[list[str]],
@@ -106,3 +110,5 @@ def output_first_match(name: str,
 
     if print_match or (print_match is None and match.group() != name):
         print(f"{name} is introduced as '{match.group()}' in the sentence.")
+    
+    return loc
