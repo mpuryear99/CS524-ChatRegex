@@ -27,7 +27,7 @@ def read_book(filename: str):
     header = []
     chapters = []
 
-    with open(filename, 'rt') as fin:
+    with open(filename, 'rt', encoding='utf-8') as fin:
         # read the header
         while not (line := next(fin)).isspace():
             header.append(line)

@@ -1,4 +1,5 @@
 import re
+import sys
 import itertools
 from typing import Iterable
 
@@ -173,8 +174,56 @@ def resp_co_occur(book: dict,
 
 
 
+def prompt_select_book():
+    """
+    Create a prompt to select a book for analysys.
+
+    Returns: dict
+        Dictionary of selected book
+    """
+    re_books = [r'|'.join([w for w in b['Title'].split() if len(w)>3]) for b in BOOKS]
+    re_books[0] = r'|'.join([re_books[0], r"1|one|first"])
+    re_books[1] = r'|'.join([re_books[1], r"2|two|second"])
+    re_books[2] = r'|'.join([re_books[2], r"3|three|third"])
+    re_books = r'|'.join(fr"({b})" for b in re_books)
+    re_books = re.compile(fr"\b(?:{re_books})\b", re.I|re.X)
+
+    print("Here are the books we have on file:")
+    for i, book in enumerate(BOOKS, 1):
+        print(f" {i}) {book['Title']:<31}  -  {book['Author']}")
+    print()
+
+    book = None
+    while book is None:
+        print("Which book would you like to analyze?   ('q' to quit)", flush=True)
+        if (prompt_in := input("> ").strip()) == 'q':
+            sys.exit()
+
+        matches = [*re_books.finditer(prompt_in)]
+        for i in range(len(BOOKS)):
+            if any((m.group(i+1) is not None) for m in matches):
+                if book is not None:
+                    break
+                book = BOOKS[i]
+
+        if book is None:
+            print("Sorry, I'm not sure which book you are referring to.",
+                  "Let's try that again!")
+
+    print(f"Analyzing '{book['Title']}' by {book['Author']}. Great choice!")
+    return book
+
+
+
+
 def main():
-    pass
+    print("\nWelcome to ChatRegex for Detective Novels!")
+    print("I'm here to help you analyze your favorite novels.", end="\n\n")
+
+    # Select a book to analyze
+    book = prompt_select_book()
+
+    return
 
 
 if __name__ == "__main__":
