@@ -6,10 +6,13 @@ from analyze_books import get_surrounding_words
 
 PROMPT_THRESH = 20
 
+def output_missing_instance_warning():
+    print("Please note that some instances may have been missed.")
+    print("This is due to a lack of context knowledge often needed to disambiguate names.")
+
 
 def output_name_cooccurence(name1: str, locs1: Iterable[tuple[int, int]],
-                            name2: str, locs2: Iterable[tuple[int, int]],
-                            print_warning: bool = True):
+                            name2: str, locs2: Iterable[tuple[int, int]]):
     """ Handle the response for two character co-occurences given index of matches.
         Co-occurences are found at the sentence and chapter scope.
     """
@@ -47,10 +50,6 @@ def output_name_cooccurence(name1: str, locs1: Iterable[tuple[int, int]],
             sts = f" {sts[0]}"
         print(f"  In chapter {ch}, they co-occur in sentence{sts}.")
 
-    if print_warning:
-        print("Please note that some co-occurences may have been missed.")
-        print("This is due to a lack of context knowledge often needed to disambiguate names.")
-
 
 def output_nearby_words(content: list[list[str]],
                         name:    str,
@@ -58,7 +57,7 @@ def output_nearby_words(content: list[list[str]],
                         prompt_thresh: int = PROMPT_THRESH):
     """ Output words surrounding matches in sets of `prompt_thresh`. """
 
-    print(f"{name} was found a total of {len(matches)} times in various forms.")
+    print(f"{name} was identified a total of {len(matches)} times in various forms.")
 
     if prompt_thresh < 2:
         prompt_thresh = len(matches)
