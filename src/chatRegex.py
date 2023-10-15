@@ -97,13 +97,13 @@ def resp_category_nearby_words(book: str,
                 content, name=name, matches=matches)
 
 
-## Generalized Response 3: co-occurence
+## Generalized Response 3: co-occurrence
 
 def resp_co_occur(book: dict,
                   name1: str | None, category1: str,
                   name2: str | None, category2: str):
     """
-    Handle responses for co-occurence given any combination of name/category.
+    Handle responses for co-occurrence given any combination of name/category.
 
     Params:
         book : dict
@@ -164,12 +164,12 @@ def resp_co_occur(book: dict,
 
     add_sep = cat_count_printed
     for (p1, l1), (p2, l2) in itertools.product(iter1, iter2):
-        # Don't print co-occurances of the same person
+        # Don't print co-occurrences of the same person
         if (p1 == p2) and (category1 == category2):
             continue
         if add_sep: print("---")
         add_sep = True
-        resp_core.output_name_cooccurence(book=book, name1=p1, locs1=l1,
+        resp_core.output_name_cooccurrence(book=book, name1=p1, locs1=l1,
                                                      name2=p2, locs2=l2)
 
 
@@ -256,8 +256,8 @@ def prompt_qa(book: dict, prompt_in: str):
 
     # Determine question type (what/when/how)
     # q_who    = bool(re.search(r"who\s(?:is|are)", prompt_in, re.I))
-    re_q_first    = r"first|appear|show\sup|(?<!co-)occur|introduced"
-    re_q_co_occur = r"co-occur|together"
+    re_q_first    = r"first|appear|show\sup|(?<!co)-?occur|introduced"
+    re_q_co_occur = r"co-?occur(rence)?|together"
     re_q_around   = r"words|around|near(?:by)?|surround"
     q_first    = bool(re.search(re_q_first, prompt_in, re.I))
     q_co_occur = bool(re.search(re_q_co_occur, prompt_in, re.I))
@@ -284,7 +284,7 @@ def prompt_qa(book: dict, prompt_in: str):
         if len(name_results) > 1 or len(cat_results) > 1:
             print(name_results, cat_results)
             print("That's a lot to answer... ",
-                  "One name/category at a time for first occurance questions please.")
+                  "One name/category at a time for first occurrence questions please.")
         elif len(name_results):
             cat, name = next(iter(name_results))
             matches = book['matches'][cat][name].items()
@@ -308,7 +308,7 @@ def prompt_qa(book: dict, prompt_in: str):
     elif (q_co_occur):
         if len(name_results) > 2 or len(cat_results) > 2 or total_results < 2:
             print("I'm not sure how to answer that... ",
-                  "Two names/categories at a time for co-occurence questions please.")
+                  "Two names/categories at a time for co-occurrence questions please.")
         elif len(name_results) == 2:
             it = iter(name_results)
             cat1, name1 = next(it)

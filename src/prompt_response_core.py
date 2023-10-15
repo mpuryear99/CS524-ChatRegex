@@ -11,11 +11,11 @@ def output_missing_instance_warning():
     print("This is due to a lack of context knowledge often needed to disambiguate names.")
 
 
-def output_name_cooccurence(book: dict,
+def output_name_cooccurrence(book: dict,
                             name1: str, locs1: Iterable[tuple[int, int]],
                             name2: str, locs2: Iterable[tuple[int, int]]):
-    """ Handle the response for two character co-occurences given index of matches.
-        Co-occurences are found at the sentence and chapter scope.
+    """ Handle the response for two character co-occurrences given index of matches.
+        Co-occurrences are found at the sentence and chapter scope.
     """
     # Process sentence scope
     st_locs_dict = {}
