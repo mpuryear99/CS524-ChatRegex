@@ -73,7 +73,7 @@ def resp_name_nearby_words(book: str,
                            name: str,
                            matches: Iterable[tuple[tuple[int, int], re.Match]]):
     resp_core.output_nearby_words(
-        content=book['content'], name=name, matches=matches, n=3)
+        content=book['content'], name=name, matches=matches)
 
 
 def resp_category_nearby_words(book: str,
@@ -84,7 +84,7 @@ def resp_category_nearby_words(book: str,
         name = 'The crime'
         matches = book['matches']['crime'].items()
         resp_core.output_nearby_words(
-            content, name=name, matches=matches, n=3)
+            content, name=name, matches=matches)
 
     else:
         # Category /w names
@@ -94,7 +94,7 @@ def resp_category_nearby_words(book: str,
         for name, matches in cat_matches.items():
             matches = matches.items()
             resp_core.output_nearby_words(
-                content, name=name, matches=matches, n=3)
+                content, name=name, matches=matches)
 
 
 ## Generalized Response 3: co-occurence
@@ -223,7 +223,7 @@ RE_CATEGORY = {
     'detectives':   r"detective|investigator|inspector",
     'perpetrators': r"perpetrator|killer|criminal|murderer|culprit|evildoer|offender|villian",
     'victims':      r"victim|casualty",
-    'suspects':     r"suspect|criminal",
+    'suspects':     r"suspect",
     'crime':        r"crime|kill|murder|dead|offense|misdeed",
 }
 
@@ -278,6 +278,7 @@ def prompt_qa(book: dict, prompt_in: str):
 
     if (q_first):
         if len(name_results) > 1 or len(cat_results) > 1:
+            print(name_results, cat_results)
             print("That's a lot to answer... ",
                   "One name/category at a time for first occurance questions please.")
         elif len(name_results):
