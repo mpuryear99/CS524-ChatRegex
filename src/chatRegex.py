@@ -1,6 +1,7 @@
 import re
 import sys
 import itertools
+import logging
 from typing import Iterable
 
 from analyze_books import BOOKS
@@ -335,11 +336,19 @@ def main():
 
     print("\nYou may now ask a question!  ('q' to quit)", end="\n\n")
     while (prompt_in := input("> ").strip()) != 'q':
-        prompt_qa(book, prompt_in)
+        try:
+            prompt_qa(book, prompt_in)
+        except Exception as e:
+            logging.exception(e, exc_info=True)
+            print("\nWell, this is awkword... Maybe try another question...")
+
         print("\nIs there anything else I can help with?  ('q' to quit)", end="\n\n")
 
     return
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt as e:
+        pass
