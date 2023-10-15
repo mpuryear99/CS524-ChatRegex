@@ -37,7 +37,7 @@ BOOK_AC_THE_MURDER_ON_THE_LINKS = {
     'victims': {
         "Paul Renauld":         r"Paul (?:\sRenauld)?",
     },
-    'crime': r"grave | golf (?:\scourse)? | stabbed",
+    'crime': r"stabbed", # r"grave | golf (?:\scourse)? | stabbed",
 }
 
 
@@ -68,7 +68,7 @@ BOOK_AC_THE_MYSTERIOUS_AFFAIR_AT_STYLES = {
     'victims': {
         'Emily Inglethorp':     r"Emily (?:\sInglethorp)?",
     },
-    'crime': r"strychnine | poison",
+    'crime': r"strychnine \s poison(?:ing)?",  # r"(?:strychnine\s)? poison(?:ing)? | strychnine",
 }
 
 
@@ -97,7 +97,7 @@ BOOK_CD_THE_HOUND_OF_THE_BASKERVILLES = {
     'victims': {
         'Charles Baskerville':  r"(?:Sir\s)? Charles (?:\sBaskerville)?",
     },
-    'crime': r"heart | cardiac | exhaustion | fatal",
+    'crime': r"shock \s (?:\S*\s)+ kill", # r"heart | cardiac | exhaustion | fatal",
 }
 
 
