@@ -4,7 +4,7 @@ from typing import Iterable
 from analyze_books import get_surrounding_words
 
 
-PROMPT_THRESH = 20
+PROMPT_THRESH = 10
 
 def output_missing_instance_warning():
     print("Please note that some instances may have been missed.")
@@ -77,7 +77,7 @@ def output_nearby_words(content: list[list[str]],
             next_thresh = min(i + prompt_thresh, len(matches))
             m_rem = len(matches)-i
             sx = input(f"Show {next_thresh-i} more ({m_rem} left)?  (Y/n)>  ") + ' '
-            if not sx.isspace() and 'n' in sx.lower():  # blank == yes
+            if (not sx.isspace()) and ('n' in sx.lower()):  # blank == yes
                 break
         prev_words, next_words = get_surrounding_words(content, match, loc)
         prev_words = ' '.join(prev_words)

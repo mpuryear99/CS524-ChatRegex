@@ -223,7 +223,7 @@ RE_CATEGORY = {
     'detectives':   r"detective|investigator|inspector",
     'perpetrators': r"perpetrator|killer|criminal|murderer|culprit|evildoer|offender|villian",
     'victims':      r"victim|casualty",
-    'suspects':     r"suspect",
+    'suspects':     r"suspect(?:ed)?",
     'crime':        r"crime|kill|murder|dead|offense|misdeed",
 }
 
@@ -345,7 +345,7 @@ def main():
             prompt_qa(book, prompt_in)
         except Exception as e:
             logging.exception(e, exc_info=True)
-            print("\nWell, this is awkword... Maybe try another question...")
+            print("\nWell, this is awkward... Maybe try another question...")
 
         print("\nIs there anything else I can help with?  ('q' to quit)", end="\n\n")
 
