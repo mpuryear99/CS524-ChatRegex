@@ -256,9 +256,12 @@ def prompt_qa(book: dict, prompt_in: str):
 
     # Determine question type (what/when/how)
     # q_who    = bool(re.search(r"who\s(?:is|are)", prompt_in, re.I))
-    q_first    = bool(re.search(r"first|introduced", prompt_in, re.I))
-    q_co_occur = bool(re.search(r"co-occur|together", prompt_in, re.I))
-    q_around   = bool(re.search(r"words|around|near(?:by)?|surround", prompt_in, re.I))
+    re_q_first    = r"first|appear|show\sup|(?<!co-)occur|introduced"
+    re_q_co_occur = r"co-occur|together"
+    re_q_around   = r"words|around|near(?:by)?|surround"
+    q_first    = bool(re.search(re_q_first, prompt_in, re.I))
+    q_co_occur = bool(re.search(re_q_co_occur, prompt_in, re.I))
+    q_around   = bool(re.search(re_q_around, prompt_in, re.I))
 
     cat_results = set()
     for cat, re_cat in RE_CATEGORY.items():
@@ -271,9 +274,10 @@ def prompt_qa(book: dict, prompt_in: str):
 
     total_results = len(name_results) + len(cat_results)
 
-    if sum([q_first, q_co_occur, q_co_occur]) != 1 or total_results == 0:
+    if sum([q_first, q_co_occur, q_around]) != 1 or total_results == 0:
         print("Sorry, but I'm not sure how to answer that.")
         print("Maybe try rephrasing the question.")
+        return
 
 
     if (q_first):
