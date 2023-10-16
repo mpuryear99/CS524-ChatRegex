@@ -256,7 +256,7 @@ def prompt_qa(book: dict, prompt_in: str):
 
     # Determine question type (what/when/how)
     # q_who    = bool(re.search(r"who\s(?:is|are)", prompt_in, re.I))
-    re_q_first    = r"(?:first|appear|show\sup|(?<!co-)(?<!co)occur|introduced|mentioned)(?!\stogether)(?!\snearby)"
+    re_q_first    = r"(?:first|appear|show\sup|(?<!co-)(?<!co)occur|introduced|mentioned)(?!\stogether)(?!\snearby)(?!\saround)"
     re_q_co_occur = r"co-?occur(?:rence)?|together"
     re_q_around   = r"words|around|near(?:by)?|surround"
     q_first    = bool(re.search(re_q_first, prompt_in, re.I))
