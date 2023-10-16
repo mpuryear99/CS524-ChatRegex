@@ -256,8 +256,8 @@ def prompt_qa(book: dict, prompt_in: str):
 
     # Determine question type (what/when/how)
     # q_who    = bool(re.search(r"who\s(?:is|are)", prompt_in, re.I))
-    re_q_first    = r"(?:first|appear|show\sup|(?<!co)-?occur|introduced)(?!\stogether)(?!\snearby)"
-    re_q_co_occur = r"co-?occur(rences?)?|together|meet"
+    re_q_first    = r"(?:first|appear|show\sup|(?<!co-)(?<!co)occur|introduced|mentioned)(?!\stogether)(?!\snearby)"
+    re_q_co_occur = r"co-?occur(?:rence)?|together"
     re_q_around   = r"words|around|near(?:by)?|surround"
     q_first    = bool(re.search(re_q_first, prompt_in, re.I))
     q_co_occur = bool(re.search(re_q_co_occur, prompt_in, re.I))
@@ -267,7 +267,7 @@ def prompt_qa(book: dict, prompt_in: str):
     for cat, re_cat in RE_CATEGORY.items():
         re_cat = rf"\b(?:(?:{re_cat})s?)\b"
         if re.search(re_cat, prompt_in, re.I|re.X) is not None:
-                cat_results.add(cat)
+            cat_results.add(cat)
 
     name_results = pro_get_name_matches(book, prompt_in)
     name_results = [(c,n) for (c,nn) in name_results.items() for n in nn.keys()]
@@ -282,7 +282,6 @@ def prompt_qa(book: dict, prompt_in: str):
 
     if (q_first):
         if len(name_results) > 1 or len(cat_results) > 1:
-            print(name_results, cat_results)
             print("That's a lot to answer... ",
                   "One name/category at a time for first occurrence questions please.")
         elif len(name_results):
